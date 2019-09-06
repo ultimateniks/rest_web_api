@@ -1,17 +1,14 @@
-#!/usr/bin/env bash
-
-sudo apt update
-sudo apt install -y curl
+    #!/usr/bin/env bash
 
 echo "Configuring Pre requisites -------> "
 docker-compose down && docker-compose up -d 
 
 echo "Configuring Dependencies -----------> "
 docker-compose run composer install --ignore-platform-reqs --quiet
+docker exec web_api_php bash -c 'chmod 777 -R /var/www' 
 docker exec web_api_php php artisan optimize:clear
 
 echo "Starting Migrations & Data Seeding -------> "
-sudo chmod 777 -R ./*
 docker exec web_api_php php artisan migrate
 docker exec web_api_php php artisan db:seed  --class=DistanceTableSeeder
 
