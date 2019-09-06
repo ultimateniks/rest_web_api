@@ -3,26 +3,20 @@
 namespace App\Http\Services;
 
 use App\Validators\LocationCoordinatesValidator;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 
 class OrderServices
 {
     public $error = null;
 
-   
     public $errorCode;
 
-    
     protected $locationCoordinatesValidator;
 
-   
     protected $DistanceRepo;
 
-   
     protected $orderRepo;
 
-   
     public function __construct(
         LocationCoordinatesValidator $locationCoordinatesValidator,
         \App\Http\Repository\orderRepo $orderRepo,
@@ -54,7 +48,7 @@ class OrderServices
         //Fetching existing distance data
         $distance = $this->DistanceRepo->get($startLat, $startLong, $endLat, $endLong);
 
-        if ($distance === false) {
+        if (false === $distance) {
             $distance = $this->DistanceRepo->create($startLat, $startLong, $endLat, $endLong);
         }
 
@@ -68,7 +62,7 @@ class OrderServices
         //Create new record
         $attributes = [
             'distance_id' => $distance->id,
-            'distance' => $distance->distance
+            'distance' => $distance->distance,
         ];
 
         $order = $this->orderRepo->create($attributes);
@@ -84,7 +78,7 @@ class OrderServices
         $orders = [];
 
         if ($page > 0 && $limit > 0) {
-            $skip = ($page -1) * $limit;
+            $skip = ($page - 1) * $limit;
             $orders = $this->orderRepo->getAllOrder($skip, $limit);
         }
 

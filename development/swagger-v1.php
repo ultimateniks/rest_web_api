@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * @SWG\Swagger(
  *     schemes={"http"},
  *     host=API_HOST,

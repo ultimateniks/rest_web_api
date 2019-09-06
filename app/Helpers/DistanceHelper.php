@@ -19,7 +19,7 @@ class DistanceHelper
     }
 
     /**
-     * Fetches distance between two pairs of latitude and longitude
+     * Fetches distance between two pairs of latitude and longitude.
      *
      * @param string $origin
      * @param string destination

@@ -21,12 +21,12 @@ class MessageHelper
         'GOOGLE_API_NULL_RESPONSE' => 'DISTANCE_API_RETURNS_NULL',
         'INVALID_PARAMETERS' => 'INVALID_PARAMETERS',
         'NOT_FOUND' => 'GEOCODING_API__FOR_ORIGIN_OR_DESTINATION_CANNOT_PAIRED',
-        'ZERO_RESULTS' => 'API_NOT_FOUND_ANY_ROUTES_FOR_GIVEN_VALUES'
+        'ZERO_RESULTS' => 'API_NOT_FOUND_ANY_ROUTES_FOR_GIVEN_VALUES',
     ];
 
     /**
      * Provided translated message if key is provided, otherwise provided whole array of
-     * key->translated_message pairs
+     * key->translated_message pairs.
      *
      * @param string|null $key
      *

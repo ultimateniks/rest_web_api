@@ -22,7 +22,7 @@ class Distance extends Model
 
     public function saveDistance($startLat, $startLong, $endLat, $endLong, $distanceBetween)
     {
-        $distance = new Distance;
+        $distance = new Distance();
         $distance->start_latitude = $startLat;
         $distance->start_longitude = $startLong;
         $distance->end_latitude = $endLat;

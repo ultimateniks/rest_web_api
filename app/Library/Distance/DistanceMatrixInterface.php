@@ -6,7 +6,7 @@ interface DistanceMatrixInterface
 {
     /**
      * Returns distance between Origin and Destination in meters
-     * In case of any error send error code in string format
+     * In case of any error send error code in string format.
      *
      * @param string $origin
      * @param string $destination

@@ -8,21 +8,18 @@ use App\Distance;
 class DistanceRepo
 {
     /**
-     *
      * @var distanceHelper
      */
     protected $distanceHelper;
 
     /**
-     *
      * @var Distance
      */
     protected $distanceModel;
 
     /**
-     *
      * @param DistanceHelper $distanceHelper
-     * @param Distance $distanceModel
+     * @param Distance       $distanceModel
      */
     public function __construct(
         DistanceHelper $distanceHelper,
@@ -33,19 +30,20 @@ class DistanceRepo
     }
 
     /**
-     * save in distance table
+     * save in distance table.
      *
      * @param string $startLatitude
      * @param string $startLongitude
      * @param string $endLatitude
      * @param string $endLongitude
+     *
      * @return distance
      */
     public function create($startLatitude, $startLongitude, $endLatitude, $endLongitude)
     {
         //no existing distance found so get distance from google maps api
-        $source = $startLatitude . "," . $startLongitude;
-        $destination = $endLatitude . "," . $endLongitude;
+        $source = $startLatitude.','.$startLongitude;
+        $destination = $endLatitude.','.$endLongitude;
         $distanceBetween = $this->distanceHelper->getDistance($source, $destination);
 
         if (!is_int($distanceBetween)) {
@@ -60,7 +58,6 @@ class DistanceRepo
             $distanceBetween
         );
     }
-
 
     public function get($startLatitude, $startLongitude, $endLatitude, $endLongitude)
     {

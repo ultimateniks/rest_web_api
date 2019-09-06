@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-
 use App\Http\Middleware\ValidateId;
 
 /*
@@ -18,7 +17,6 @@ use App\Http\Middleware\ValidateId;
 Route::get('orders', 'OrderController@getAllOrder');
 Route::post('orders', 'OrderController@store');
 Route::middleware(ValidateId::class)->patch('orders/{id}', 'OrderController@patchOrderStatus');
-
 
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();

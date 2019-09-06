@@ -9,7 +9,6 @@ class LocationCoordinatesValidator
     const LONGITUDE_RANGE_LOWER_LIMIT = -180;
     const LONGITUDE_RANGE_UPPER_LIMIT = 180;
 
-  
     protected $error;
 
     public function getError()
@@ -17,7 +16,6 @@ class LocationCoordinatesValidator
         return $this->error;
     }
 
-    
     public function validate($startLat, $startLong, $endLat, $endLong)
     {
         if ($startLat == $endLat && $startLong == $endLong) {

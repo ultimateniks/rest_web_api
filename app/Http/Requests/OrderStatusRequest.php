@@ -18,16 +18,16 @@ class OrderStatusRequest extends AbstractFormRequest
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
-                    if ($value !== Order::ASSIGNED_ORDER_STATUS) {
+                    if (Order::ASSIGNED_ORDER_STATUS !== $value) {
                         $fail('INVALID_STATUS');
                     }
                 },
-            ]
+            ],
         ];
     }
 
     /**
-     * Custom message for validation
+     * Custom message for validation.
      *
      * @return array
      */

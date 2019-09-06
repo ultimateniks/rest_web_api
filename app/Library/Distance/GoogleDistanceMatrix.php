@@ -5,13 +5,13 @@ namespace App\Library\Distance;
 class GoogleDistanceMatrix implements DistanceMatrixInterface
 {
     /**
-     * {@inheritedDocs}
+     * {@inheritedDocs}.
      */
     public function getDistance($origin, $destination)
     {
         $googleApiKey = env('GOOGLE_API_KEY');
 
-        $queryString =  env('GOOGLE_API_URL') . "?units=imperial&origins=" . $origin . "&destinations=" . $destination . "&key=" . $googleApiKey;
+        $queryString = env('GOOGLE_API_URL').'?units=imperial&origins='.$origin.'&destinations='.$destination.'&key='.$googleApiKey;
 
         $data = $dataElements = null;
         try {
@@ -22,10 +22,10 @@ class GoogleDistanceMatrix implements DistanceMatrixInterface
             $dataElements = $data->rows[0]->elements[0];
 
             if (!$data
-                || $data->status == 'REQUEST_DENIED'
-                || $data->status == 'OVER_QUERY_LIMIT'
-                || $data->status == 'NOT_FOUND'
-                || $data->status == 'ZERO_RESULTS'
+                || 'REQUEST_DENIED' == $data->status
+                || 'OVER_QUERY_LIMIT' == $data->status
+                || 'NOT_FOUND' == $data->status
+                || 'ZERO_RESULTS' == $data->status
             ) {
                 return (isset($data->status)) ? $data->status : 'GOOGLE_API_NULL_RESPONSE';
             }

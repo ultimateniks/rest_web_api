@@ -21,12 +21,12 @@ class OrderListRequest extends AbstractFormRequest
                 'required',
                 'int',
                 'min:1',
-            ]
+            ],
         ];
     }
 
     /**
-     * Custom message for validation
+     * Custom message for validation.
      *
      * @return array
      */

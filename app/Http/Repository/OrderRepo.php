@@ -8,20 +8,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class OrderRepo
 {
     /**
-     *
      * @var Order
      */
     protected $orderModel;
 
     /**
-     *
      * @param Order $orderModel
      */
     public function __construct(Order $orderModel)
     {
         $this->orderModel = $orderModel;
     }
-
 
     public function create($attributes)
     {
@@ -34,12 +31,12 @@ class OrderRepo
     }
 
     /**
-    * Fetches a order model using its primary key
-    *
-    * @param int $id
-    *
-    * @return self|false
-    */
+     * Fetches a order model using its primary key.
+     *
+     * @param int $id
+     *
+     * @return self|false
+     */
     public function getOrderById($id)
     {
         try {
@@ -50,7 +47,7 @@ class OrderRepo
     }
 
     /**
-     * Update order status from UNASSIGNED to TAKEN if order is not already taken
+     * Update order status from UNASSIGNED to TAKEN if order is not already taken.
      *
      * @param int $orderId
      *
@@ -68,10 +65,11 @@ class OrderRepo
     }
 
     /**
-     * to get order list
+     * to get order list.
      *
      * @param int $skip
      * @param int $limit
+     *
      * @return array
      */
     public function getAllOrder($skip, $limit)

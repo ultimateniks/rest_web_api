@@ -14,7 +14,7 @@ class AddOrderRequest extends AbstractFormRequest
                 'required',
                 'array',
                 function ($attribute, $value, $fail) {
-                    if (count($value) !== 2
+                    if (2 !== count($value)
                         || empty($value[0])
                         || empty($value[1])
                         || !is_numeric($value[0])
@@ -28,7 +28,7 @@ class AddOrderRequest extends AbstractFormRequest
                 'required',
                 'array',
                 function ($attribute, $value, $fail) {
-                    if (count($value) !== 2
+                    if (2 !== count($value)
                         || empty($value[0])
                         || empty($value[1])
                         || !is_numeric($value[0])
