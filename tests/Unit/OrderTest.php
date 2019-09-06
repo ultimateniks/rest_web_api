@@ -7,6 +7,8 @@ use Faker\Factory as Faker;
 use App\Http\Controllers\OrderController;
 use App\Order;
 use Illuminate\Http\JsonResponse;
+use App\Http\Services\OrderServices;
+use App\Distance;
 
 class OrderTest extends TestCase
 {
@@ -14,14 +16,20 @@ class OrderTest extends TestCase
         Order::UNASSIGNED_ORDER_STATUS,
         Order::ASSIGNED_ORDER_STATUS,
     ];
+    protected $locationCoordsValidatorMock;
+    protected $orderRepoMock;
+    protected $distRepoMock;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->faker = Faker::create();
-        $this->orderServiceMock = \Mockery::mock(\App\Http\Services\OrderServices::class);
+        $this->orderServiceMock = \Mockery::mock(OrderServices::class);
         $this->responseMock = $this->createResponseMock();
+        $this->locationCoordsValidatorMock = $this->createMock(\App\Validators\LocationCoordinatesValidator::class);
+        $this->orderRepoMock = \Mockery::mock(\App\Http\Repository\OrderRepo::class);
+        $this->distRepoMock = \Mockery::mock(\App\Http\Repository\DistanceRepo::class);
 
         $this->app->instance(
             OrderController::class,
@@ -40,7 +48,7 @@ class OrderTest extends TestCase
     public function testAddOrderForValidData()
     {
         echo "\n Unit Test Cases running ---->\n\n\n";
-        echo "\n Add valid Order ----> \n";
+        echo "\n\n\n Add valid Order ----> \n";
 
         $order = $this->generateTestOrder();
 
@@ -64,6 +72,38 @@ class OrderTest extends TestCase
         $this->assertInternalType('array', $data);
         $this->assertArrayHasKey('id', $data);
         $this->assertArrayHasKey('distance', $data);
+    }
+
+    public function testAddOrderForValidCoordinates()
+    {
+        echo "\n Add order for valid Coordinates  ----> \n";
+
+        $order = $this->generateTestOrder();
+        $distance = $this->generateTestDisatnceObj();
+        $distCoords = $this->generateTestCords();
+
+        $origin = implode(',', $distCoords['origin']);
+        $destination = implode(',', $distCoords['destination']);
+
+        //Mock dependencies
+        $this->locationCoordsValidatorMock->method('validate')->with(
+            $distCoords['origin'][0],
+            $distCoords['origin'][1],
+            $distCoords['destination'][0],
+            $distCoords['destination'][1]
+        )->willReturn(true);
+
+        $this->distRepoMock->shouldReceive('get')->andReturn($distance);
+
+        $this->orderRepoMock->shouldReceive('create')->andReturn($order);
+
+        $orderServices = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $this->assertInstanceOf('App\Order', $orderServices->addOrder((object) $distCoords));
     }
 
     public function testAddOrderForInvalidData()
@@ -90,6 +130,97 @@ class OrderTest extends TestCase
         $response->assertStatus(JsonResponse::HTTP_BAD_REQUEST);
         $this->assertInternalType('array', $data);
         $this->assertArrayHasKey('error', $data);
+    }
+
+    public function testAddOrderForInvalidCoordinates()
+    {
+        echo "\n Add order for Invalid Coordinates  ----> \n";
+
+        $order = $this->generateTestOrder();
+        $distance = $this->generateTestDisatnceObj();
+        $distCoords = $this->generateTestCords();
+
+        $origin = implode(',', $distCoords['origin']);
+        $destination = implode(',', $distCoords['destination']);
+
+        $this->locationCoordsValidatorMock->method('validate')->with(
+            $distCoords['origin'][0],
+            $distCoords['origin'][1],
+            $distCoords['destination'][0],
+            $distCoords['destination'][1]
+        )->willReturn(false);
+
+        $this->distRepoMock->shouldReceive('get')->andReturn($distance);
+        $this->distRepoMock->shouldReceive('create')->andReturn($order);
+
+        $orderServices = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $this->assertEquals(false, $orderServices->addOrder((object) $distCoords));
+    }
+
+    public function testAddDistanceForValidCoordinates()
+    {
+        echo "\n create order using new distance coordinates -----> \n";
+
+        $order = $this->generateTestOrder();
+        $distance = $this->generateTestDisatnceObj();
+        $distCoords = $this->generateTestCords();
+
+        $origin = implode(',', $distCoords['origin']);
+        $destination = implode(',', $distCoords['destination']);
+
+        $this->locationCoordsValidatorMock->method('validate')->with(
+            $distCoords['origin'][0],
+            $distCoords['origin'][1],
+            $distCoords['destination'][0],
+            $distCoords['destination'][1]
+        )->willReturn(true);
+        $this->distRepoMock->shouldReceive('get')->andReturn(false);
+        $this->distRepoMock->shouldReceive('create')->andReturn($distance);
+        $this->orderRepoMock->shouldReceive('create')->andReturn($order);
+
+        $orderService = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $this->assertInstanceOf('App\Order', $orderService->addOrder((object) $distCoords));
+    }
+
+    public function testAddDistanceForInValidData()
+    {
+        echo "\n  create order using new distance for invalid Response -----> \n";
+
+        $order = $this->generateTestOrder();
+        $distance = $this->generateTestDisatnceObj();
+        $distCoords = $this->generateTestCords();
+
+        $origin = implode(',', $distCoords['origin']);
+        $destination = implode(',', $distCoords['destination']);
+
+        //Mock dependencies
+        $this->locationCoordsValidatorMock->method('validate')->with(
+            $distCoords['origin'][0],
+            $distCoords['origin'][1],
+            $distCoords['destination'][0],
+            $distCoords['destination'][1]
+        )->willReturn(true);
+        $this->distRepoMock->shouldReceive('get')->andReturn(false);
+        $this->distRepoMock->shouldReceive('create')->andReturn(false);
+        $this->orderRepoMock->shouldReceive('create')->andReturn($order);
+
+        $orderServices = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $this->assertEquals(false, $orderServices->addOrder((object) $distCoords));
     }
 
     public function testAddOrder_NegativeTestCase_Exception()
@@ -232,6 +363,46 @@ class OrderTest extends TestCase
         $this->assertArrayHasKey('error', $data);
     }
 
+    public function testgetOrderUsingId()
+    {
+        echo "\n Get Order using valid order id -----> \n";
+        $orderServices = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $id = $this->faker->randomDigit();
+        $order = $this->generateTestOrder();
+
+        $this->orderRepoMock->shouldReceive('getOrderById')->with($id)->andReturn($order);
+
+        $response = $orderServices->getOrderUsingId($id);
+
+        echo "\n \t Response should be intance of Order Model .. \n";
+        $this->assertInstanceOf('\App\Order', $response);
+    }
+
+    public function testtakeOrder()
+    {
+        echo "\n Take Order using valid order id -----> \n";
+        $orderServices = new OrderServices(
+            $this->locationCoordsValidatorMock,
+            $this->orderRepoMock,
+            $this->distRepoMock
+        );
+
+        $id = $this->faker->randomDigit();
+        $order = $this->generateTestOrder();
+
+        $this->orderRepoMock->shouldReceive('takeOrder')->with($id)->andReturn(true);
+
+        $response = $orderServices->takeOrder($id);
+
+        echo "\n \t should be boolean Type response \n";
+        $this->assertEquals(true, $response);
+    }
+
     /**
      * @param int|null $id
      *
@@ -250,6 +421,50 @@ class OrderTest extends TestCase
         $order->updated_at = $this->faker->dateTimeBetween();
 
         return $order;
+    }
+
+    private function generateTestDisatnceObj()
+    {
+        $id = $this->faker->randomDigit();
+
+        $distObject = new Distance();
+        $distObject->id = $id;
+        $distObject->start_latitude = $this->faker->latitude();
+        $distObject->start_longitude = $this->faker->longitude();
+        $distObject->end_latitude = $this->faker->latitude();
+        $distObject->end_longitude = $this->faker->longitude();
+        $distObject->distance = $this->faker->numberBetween(1000, 5000);
+
+        return $distObject;
+    }
+
+    protected function generateTestCords()
+    {
+        $faker = Faker::create();
+
+        $startLat = $faker->latitude();
+        $startLong = $faker->latitude();
+        $endLat = $faker->longitude();
+        $endLong = $faker->longitude();
+
+        $distance = $this->distance($startLat, $startLong, $endLat, $endLong);
+
+        return [
+            'origin' => [$startLat, $startLong],
+            'destination' => [$endLat, $endLong],
+            'distance' => $distance,
+        ];
+    }
+
+    public function distance($lat1, $lon1, $lat2, $lon2)
+    {
+        $theta = $lon1 - $lon2;
+        $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $distInMetre = $dist * 60 * 1.1515 * 1.609344 * 1000;
+
+        return (int) $distInMetre;
     }
 
     /**
