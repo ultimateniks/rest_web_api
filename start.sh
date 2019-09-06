@@ -12,11 +12,7 @@ echo "Starting Migrations & Data Seeding -------> "
 docker exec web_api_php php artisan migrate
 docker exec web_api_php php artisan db:seed  --class=DistanceTableSeeder
 
-echo "Starting Unit test cases ------->"
-docker exec web_api_php php ./vendor/phpunit/phpunit/phpunit ./tests/Unit
-
-echo "Starting Intergration test cases ------->"
-docker exec web_api_php php ./vendor/phpunit/phpunit/phpunit ./tests/Feature
-
+echo "Starting Unit and Intergration test cases ------->"
+docker exec web_api_php php ./vendor/phpunit/phpunit/phpunit ./tests
 
 exit 0
