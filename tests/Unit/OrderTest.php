@@ -64,8 +64,9 @@ class OrderTest extends TestCase
             ->andReturn($order);
 
         $response = $this->call('POST', '/orders', $params);
-        $data = (array) $response->getData()->data;
 
+        $data = (array) $response->getData();
+        // print_r($data);
         //print_r($response->getData()->data);
 
         $response->assertStatus(JsonResponse::HTTP_OK);

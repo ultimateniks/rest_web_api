@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Services\OrderServices;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\AddOrderRequest;
-use App\Http\Resources\OrderResource;
 use App\Http\Response\ResponseHelper;
 use App\Http\Requests\OrderStatusRequest;
 use App\Http\Requests\OrderListRequest;
@@ -14,11 +13,11 @@ use Illuminate\Http\JsonResponse;
 class OrderController extends Controller
 {
     protected $responseHelper;
-    protected $OrderServices;
+    protected $orderServices;
 
-    public function __construct(OrderServices $OrderServices, ResponseHelper $responseHelper)
+    public function __construct(OrderServices $orderServices, ResponseHelper $responseHelper)
     {
-        $this->OrderServices = $OrderServices;
+        $this->orderServices = $orderServices;
         $this->responseHelper = $responseHelper;
     }
 
@@ -26,13 +25,13 @@ class OrderController extends Controller
     public function store(AddOrderRequest $request)
     {
         try {
-            $order = $this->OrderServices->addOrder($request);
+            $order = $this->orderServices->addOrder($request);
 
             if ($order instanceof \App\Order) {
-                return (new OrderResource($order))->response()->setStatusCode(JsonResponse::HTTP_OK);
+                return $this->responseHelper->formatOrderAsResponse($order);
             } else {
-                $messages = $this->OrderServices->error;
-                $errorCode = $this->OrderServices->errorCode;
+                $messages = $this->orderServices->error;
+                $errorCode = $this->orderServices->errorCode;
                 Log::error('Add Order error-'.$messages.$errorCode);
 
                 return $this->responseHelper->sendErrorResponse($messages, $errorCode);
@@ -52,7 +51,7 @@ class OrderController extends Controller
             $page = (int) $request->get('page', 1);
             $limit = (int) $request->get('limit', 1);
 
-            $records = $this->OrderServices->getAllOrders($page, $limit);
+            $records = $this->orderServices->getAllOrders($page, $limit);
 
             $allOrders = [];
             foreach ($records as $record) {
@@ -71,14 +70,14 @@ class OrderController extends Controller
     public function patchOrderStatus(OrderStatusRequest $request, $id)
     {
         try {
-            $order = $this->OrderServices->getOrderUsingId($id);
+            $order = $this->orderServices->getOrderUsingId($id);
             if (false === $order) {
                 Log::error('Order Status error '.'- order_not_found in Order Status');
 
                 return $this->responseHelper->sendErrorResponse('order_not_found', JsonResponse::HTTP_NOT_FOUND);
             }
 
-            if (false === $this->OrderServices->takeOrder($id)) {
+            if (false === $this->orderServices->takeOrder($id)) {
                 Log::error('Order Status error '.'- order_already_taken in Order Status');
 
                 return $this->responseHelper->sendErrorResponse('order_already_taken', JsonResponse::HTTP_CONFLICT);

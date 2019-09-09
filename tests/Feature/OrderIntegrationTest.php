@@ -163,7 +163,7 @@ class OrderIntegrationTest extends TestCase
         $response = $this->json('POST', '/orders', $validData);
         $data = (array) $response->getData();
         //print_r($data);
-        $orderId = $data['data']->id;
+        $orderId = $data['id'];
 
         // echo "\n > Order has been created with id : ".$orderId;
 
