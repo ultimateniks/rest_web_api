@@ -48,9 +48,25 @@ class Handler extends ExceptionHandler
     {
         if ($exception instanceof MethodNotAllowedHttpException) {
             return response()->json([
-                                        'success' => 0,
-                                        'message' => 'Method is not allowed for the requested route',
-                                    ], 405);
+                'success' => 0,
+                'message' => 'Method is not allowed for the requested route',
+            ], 405);
+        }
+
+        if ($this->isHttpException($exception)) {
+            if ($exception->getStatusCode() == 404) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Method not found',
+                ], 404);
+            }
+
+            if ($exception->getStatusCode() == 500) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Internal Server error.',
+                ], 500);
+            }
         }
 
         return parent::render($request, $exception);
